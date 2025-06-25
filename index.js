@@ -1,7 +1,49 @@
 class Game {
+
+    /**
+     * Creates score variables and button components
+     */
     constructor(humanScore = 0, computerScore = 0) {
-        this.humanScore = humanScore;
+        this.roundCounter = 0;
+        this.humanScore = humanScore; // "this." - functions like class variables / data members
         this.computerScore = computerScore;
+        this.humanChoice = "";
+        this.computerChoice = "";
+
+        this.container = document.querySelector("#container");
+        this.buttonDiv = document.createElement("div");
+        this.buttonDiv.classList.add("button-container");
+        this.rockB = document.createElement("button");
+        this.rockB.textContent = "Rock";
+        this.scissorB = document.createElement("button");
+        this.scissorB.textContent = "Scissors";
+        this.paperB = document.createElement("button");
+        this.paperB.textContent = "Paper";
+
+        this.textDiv = document.createElement("div");
+        this.textDiv.classList.add("text-container");
+        this.score = document.createElement("h4");
+        this.dialogue = document.createElement("h3");
+
+
+        // this.scissorB.addEventListener('click', () => { // arrow function, same as what's below
+        //     // something
+        // });
+
+        //need to use () => to pass function to the event listeners
+        this.rockB.addEventListener('click', () => this.setHumanChoice(1));
+        this.scissorB.addEventListener('click', () => this.setHumanChoice(2));
+        this.paperB.addEventListener('click', () => this.setHumanChoice(3));
+        this.buttonDiv.append(this.rockB);
+        this.buttonDiv.append(this.scissorB);
+        this.buttonDiv.append(this.paperB);
+        this.container.append(this.buttonDiv);
+
+        this.dialogue.textContent = "Click on a button to play Rock Paper Scissors!";
+        this.textDiv.append(this.dialogue);
+        this.textDiv.append(this.score);
+        this.container.append(this.textDiv);
+
     }
 
     getComputerChoice() {
@@ -9,43 +51,43 @@ class Game {
         return this.getAction(num)
     };
 
-    getHumanChoice() {
-        let num;
-        do {
-            num = parseInt(prompt("Please enter 1, 2, or 3 (rock, scissors, or paper, respectively)"));
-        } while (Number.isNaN(num) || num < 1 || num > 3);
-        return this.getAction(num);
-    };
+    // getHumanChoice() {
+    //     let num;
+    //     do {
+    //         num = parseInt(prompt("Please enter 1, 2, or 3 (rock, scissors, or paper, respectively)"));
+    //     } while (Number.isNaN(num) || num < 1 || num > 3);
+    //     return this.getAction(num);
+    // };
 
-    getRoundWinner(humanChoice, computerChoice) {
-        if (humanChoice === "rock") {
-            if (computerChoice === "scissors") {
+    setRoundWinner() {
+        if (this.humanChoice === "rock") {
+            if (this.computerChoice === "scissors") {
                 ++this.humanScore;
             }
-            else if (computerChoice === "paper") {
+            else if (this.computerChoice === "paper") {
                 ++this.computerScore;
             }
         }
 
-        if (humanChoice === "paper") {
-            if (computerChoice === "scissors") {
+        if (this.humanChoice === "paper") {
+            if (this.computerChoice === "scissors") {
                 ++this.computerScore;
             }
-            else if (computerChoice === "rock") {
+            else if (this.computerChoice === "rock") {
                 ++this.humanScore;
             }
         }
 
-        if (humanChoice === "scissors") {
-            if (computerChoice === "rock") {
+        if (this.humanChoice === "scissors") {
+            if (this.computerChoice === "rock") {
                 ++this.computerScore;
             }
-            else if (computerChoice === "paper") {
+            else if (this.computerChoice === "paper") {
                 ++this.humanScore;
             }
         }
-
-        console.log(`Player score: ${this.humanScore}, Computer Score: ${this.computerScore}\n`);
+        this.dialogue.textContent = `You chose ${this.humanChoice} and the CPU chose ${this.computerChoice}`;
+        this.score.textContent = `You: ${this.humanScore}, CPU: ${this.computerScore}`;
     }
 
     getAction(num) {
@@ -62,27 +104,36 @@ class Game {
                 break;
         }
         return action;
+    }
+
+    setHumanChoice(num) {
+        this.humanChoice = this.getAction(num);
+        this.computerChoice = this.getComputerChoice();
+        this.playRound();
     };
 
     playRound() {
-        let humanChoice = this.getHumanChoice();
-        let computerChoice = this.getComputerChoice();
-        this.getRoundWinner(humanChoice, computerChoice);
+        this.setRoundWinner();
+        ++this.roundCounter;
+        if (this.roundCounter == 3) {
+            this.determineWinner();
+        }
     };
 
-    playGame() {
-        for (let i = 0; i < 3; ++i) {
-            this.playRound();
-        }
+    determineWinner() {
+         this.dialogue.textContent = `You chose ${this.humanChoice} and the CPU chose ${this.computerChoice}`;
         if (this.humanScore > this.computerScore) {
-            console.log("You won!");
-        } else if (this.humanScore == this.computerSocre) {
-            console.log("You tied");
+            this.score.innerHTML = `You: ${this.humanScore}, CPU: ${this.computerScore} <br><br> You won!`;
+        } else if (this.humanScore == this.computerScore) {
+             this.score.innerHTML = `You: ${this.humanScore}, CPU: ${this.computerScore} <br><br> You tied`;
         } else {
-            console.log("You lost")
+             this.score.innerHTML = `You: ${this.humanScore}, CPU: ${this.computerScore} <br><br> You lost :(`;
         }
+
+        this.roundCounter = 0;
+        this.humanScore = 0;
+        this.computerScore = 0;
+
     };
 }
-
 let game = new Game();
-game.playGame();
